@@ -1,12 +1,14 @@
+
 name: Build Android APK
 
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout repository
@@ -30,7 +32,9 @@ jobs:
         distribution: 'temurin'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
+      with:
+        packages: platform-tools
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
@@ -47,7 +51,7 @@ jobs:
         test -f "$GITHUB_WORKSPACE/third_party/demucs-android/CMakeLists.txt"
 
     - name: Build with Gradle
-      run: gradle assembleDebug --stacktrace
+      run: gradle assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
